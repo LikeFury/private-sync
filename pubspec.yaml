@@ -1,0 +1,8 @@
+name: private_sync
+
+environment:
+  sdk: '^3.4.0'
+
+dependencies:
+  dartssh2: ^2.8.2
+  

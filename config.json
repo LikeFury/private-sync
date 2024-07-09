@@ -1,10 +1,11 @@
 {
     "hostname": "192.168.1.2",
     "username": "root",
+    "remote_directory": "/root/sync",
     "sync_directorys": [
         {
             "name": "Test",
-            "local_directory": "/home/tsarbomba/sync"
+            "local_directory": "/home/demoncore/sync"
         }
     ]
 }

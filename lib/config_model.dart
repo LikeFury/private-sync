@@ -4,6 +4,7 @@ class ConfigModel {
   String hostname;
   int port;
   String username;
+  String remoteDirectory;
   String? password;
   String? privateKeyDirectory;
   List<SyncModel> syncDirectorys;
@@ -13,6 +14,7 @@ class ConfigModel {
       this.port = 22,
       required this.username,
       this.password = null,
+      required this.remoteDirectory,
       this.privateKeyDirectory = null,
       required this.syncDirectorys});
 
@@ -22,6 +24,7 @@ class ConfigModel {
       'port': port,
       'username': username,
       'password': password,
+      'remote_directory': remoteDirectory,
       'private_key_directory': privateKeyDirectory
     };
   }
@@ -32,6 +35,7 @@ class ConfigModel {
         port: map['port'] ?? 22,
         username: map['username'],
         password: map['passsword'],
+        remoteDirectory: map['remote_directory'],
         privateKeyDirectory: map['private_key_directory'],
         syncDirectorys: map['sync_directorys']
             .map<SyncModel>((sync) => SyncModel.fromMap(sync))

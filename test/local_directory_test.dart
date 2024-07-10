@@ -4,35 +4,38 @@ import 'dart:io';
 import 'package:private_sync/local_directory.dart';
 import 'package:test/test.dart';
 
-/*void main() async {
+void main() async {
   test('Local Directory parses directory correctly', () async {
-    
+    var file1 =
+        await File(Directory.current.path + '/test/fixtures/local/dir1/file1')
+            .create(recursive: true);
+    await file1.setLastModified(DateTime(2020, 9, 7, 17, 30));
+
+    var file2 =
+        await File(Directory.current.path + '/test/fixtures/local/dir1/file2')
+            .create(recursive: true);
+    await file2.setLastModified(DateTime(2021, 9, 7, 17, 30));
+
+    var file3 =
+        await File(Directory.current.path + '/test/fixtures/local/dir2/file3')
+            .create(recursive: true);
+    await file3.setLastModified(DateTime(2022, 9, 7, 17, 30));
+
+    var file4 = await File(Directory.current.path + '/test/fixtures/local/file')
+        .create(recursive: true);
+    await file4.setLastModified(DateTime(2024, 1, 1, 1, 30));
+
     LocalDirectory local =
         LocalDirectory(Directory.current.path + "/test/fixtures/local");
 
     await local.parseDirectory();
 
-    await expectLater(
-        local.parseDirectory(), completion(local.files.length == 6));
+    expect(local.files.length, 4);
+    expect(local.lastestFile, DateTime(2024, 1, 1, 1, 30));
+
+    await file1.delete();
+    await file2.delete();
+    await file3.delete();
+    await file4.delete();
   });
-}*/
-
-void main() async {
-  test('Test output gets updates', () async {
-    Test test = Test();
-
-    await test.update();
-
-    expect(test.output, 'Future Updated');
-  });
-}
-
-class Test {
-  String output = '';
-
-  Future<void> update() async {
-    await Future.delayed(Duration(seconds: 1), () {
-      output = 'Future Updated';
-    });
-  }
 }

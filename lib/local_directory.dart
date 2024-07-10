@@ -2,38 +2,35 @@ import 'dart:io';
 
 class LocalDirectory {
   String path;
-
-  List<File> files = [];
+  List<LocalFile> files = [];
+  DateTime lastestFile = DateTime(1900);
 
   LocalDirectory(this.path);
 
-  Future<List<File>> parseDirectory() async {
+  Future<void> parseDirectory() async {
     final dir = Directory(path);
     final List<FileSystemEntity> entities =
         await dir.list(recursive: true).toList();
 
-    entities.forEach((FileSystemEntity entity) async {
-      if (FileSystemEntity.isFileSync(entity.path)) {
-        print(entity);
+    await Future.forEach(entities, (FileSystemEntity entity) async {
+      if (await FileSystemEntity.isFile(entity.path)) {
         final stat = await entity.stat();
-        files.add(File(entity.path, stat.modified.millisecondsSinceEpoch));
-        print(files.length);
-      }
 
-      /*print(entity);
-      final stat = await entity.stat();
-      print(stat.modified.millisecondsSinceEpoch /
-          Duration.millisecondsPerSecond);*/
+        if (stat.modified.isAfter(lastestFile)) {
+          lastestFile = stat.modified;
+        }
+
+        files.add(LocalFile(entity.path, stat.modified));
+      }
     });
 
-    //return;
-    return files;
+    return;
   }
 }
 
-class File {
+class LocalFile {
   String path;
-  int modifyTime;
+  DateTime modifyTime;
 
-  File(this.path, this.modifyTime);
+  LocalFile(this.path, this.modifyTime);
 }

@@ -3,7 +3,7 @@ import 'dart:io';
 class LocalDirectory {
   String path;
   List<LocalFile> files = [];
-  DateTime lastestFile = DateTime(1900);
+  DateTime lastestFileTime = DateTime(1900);
 
   LocalDirectory(this.path);
 
@@ -16,8 +16,8 @@ class LocalDirectory {
       if (await FileSystemEntity.isFile(entity.path)) {
         final stat = await entity.stat();
 
-        if (stat.modified.isAfter(lastestFile)) {
-          lastestFile = stat.modified;
+        if (stat.modified.isAfter(lastestFileTime)) {
+          lastestFileTime = stat.modified;
         }
 
         files.add(LocalFile(entity.path, stat.modified));

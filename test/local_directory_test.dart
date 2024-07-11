@@ -31,7 +31,7 @@ void main() async {
     await local.parseDirectory();
 
     expect(local.files.length, 4);
-    expect(local.lastestFile, DateTime(2024, 1, 1, 1, 30));
+    expect(local.lastestFileTime, DateTime(2024, 1, 1, 1, 30));
 
     await file1.delete();
     await file2.delete();

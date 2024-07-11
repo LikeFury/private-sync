@@ -4,34 +4,44 @@ import 'dart:io';
 
 import 'package:private_sync/config_model.dart';
 import 'package:private_sync/local_directory.dart';
+import 'package:private_sync/remote_directory.dart';
 import 'package:private_sync/ssh.dart';
 
 Future<void> main() async {
   print('Private Sync');
-  print('Running Sync');
 
-  //var input = await File('config.json').readAsString();
-  //var map = jsonDecode(input);
+  var input = await File('config.json').readAsString();
+  var map = jsonDecode(input);
 
-  //ConfigModel config = ConfigModel.fromMap(map);
+  ConfigModel config = ConfigModel.fromMap(map);
 
-/*  LocalDirectory local =
-      LocalDirectory(config.syncDirectorys[0].localDirectory);
+  Ssh sshClient =
+      Ssh(host: config.hostname, port: config.port, username: config.username);
 
-  await local.getDirectoryContents();
-  */
+  print("Connecting to " + config.hostname);
 
-  //inspect(config);
+  await sshClient.connect();
 
-  /*final dir = Directory('/home/tsarbomba/');
-  final List<FileSystemEntity> entities = await dir.list().toList();
-  entities.forEach(print);*/
+  await Future.forEach(config.syncDirectorys, (directory) async {
+    print("Syncing " + directory.name + " " + directory.localDirectory);
 
-  /*var ssh = Ssh(host: config.hostname, username: config.username);
-  await ssh.connect();
-  await ssh.list();
+    var local = LocalDirectory(directory.localDirectory);
+    await local.parseDirectory();
 
-  //await ssh.writeFile();
+    print("Latest local change: " + local.lastestFileTime.toString());
 
-  await ssh.close();*/
+    print("Remote directory: " + config.remoteDirectory + '/' + directory.name);
+    var remote = RemoteDirectory(
+        sshClient, config.remoteDirectory + '/' + directory.name);
+    await remote.parseDirectory();
+    print("Remote last change: " + remote.lastestFileTime.toString());
+
+    if (local.lastestFileTime.isAfter(remote.lastestFileTime)) {
+      print("Local is newer");
+    } else {
+      print("Remote is newer");
+    }
+  });
+
+  await sshClient.close();
 }

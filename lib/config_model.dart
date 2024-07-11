@@ -1,4 +1,4 @@
-import 'package:private_sync/sync_model.dart';
+import 'package:private_sync/sync_directory_model.dart';
 
 class ConfigModel {
   String hostname;
@@ -7,7 +7,7 @@ class ConfigModel {
   String remoteDirectory;
   String? password;
   String? privateKeyDirectory;
-  List<SyncModel> syncDirectorys;
+  List<SyncDirectoryModel> syncDirectorys;
 
   ConfigModel(
       {required this.hostname,
@@ -38,7 +38,7 @@ class ConfigModel {
         remoteDirectory: map['remote_directory'],
         privateKeyDirectory: map['private_key_directory'],
         syncDirectorys: map['sync_directorys']
-            .map<SyncModel>((sync) => SyncModel.fromMap(sync))
+            .map<SyncDirectoryModel>((sync) => SyncDirectoryModel.fromMap(sync))
             .toList());
   }
 }

@@ -5,8 +5,10 @@ import 'dart:math';
 
 import 'package:private_sync/config_model.dart';
 import 'package:private_sync/local_directory.dart';
+import 'package:private_sync/models/sync_file_model.dart';
 import 'package:private_sync/remote_directory.dart';
 import 'package:private_sync/ssh.dart';
+import 'package:private_sync/sync.dart';
 
 Future<void> main() async {
   print('Private Sync');
@@ -31,6 +33,10 @@ Future<void> main() async {
 
     print("Latest local change: " + local.lastestFileTime.toString());
 
+    local.files.forEach((SyncFileModel file) {
+      print(file.path);
+    });
+
     print("Remote directory: " + config.remoteDirectory + '/' + directory.name);
     var remote = RemoteDirectory(
         sshClient, config.remoteDirectory + '/' + directory.name);
@@ -41,12 +47,9 @@ Future<void> main() async {
       print(file.path + " " + file.modifyTime.toString());
     });
 
-    if (local.lastestFileTime.isAfter(remote.lastestFileTime)) {
-      print("Local is newer");
-    } else if (local.lastestFileTime.isBefore(remote.lastestFileTime)) {
-      print("Remote is newer");
-    } else {
-      print("Local and remote are the same");
+    if (!local.lastestFileTime.isAtSameMomentAs(remote.lastestFileTime)) {
+      print("Sync needed");
+      await Sync(sshClient).sync(local, remote);
     }
   });
 

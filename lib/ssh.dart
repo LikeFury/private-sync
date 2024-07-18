@@ -20,7 +20,7 @@ class Ssh {
       username: username,
       identities: [
         ...SSHKeyPair.fromPem(
-            await File('/home/demoncore/.ssh/id_rsa').readAsString())
+            await File(getHomeDirectory() + '/.ssh/id_rsa').readAsString())
       ],
       //onPasswordRequest: () => '<password>',
       //printDebug: (String? message) => print(message)
@@ -29,6 +29,9 @@ class Ssh {
     sftpClient = await client.sftp();
   }
 
+  /**
+   * List Directory
+   */
   Future<List<SyncFileModel>> listDirectory(String path) async {
     List<SyncFileModel> files = [];
 
@@ -52,19 +55,26 @@ class Ssh {
     return files;
   }
 
-  Future<void> writeFile() async {
-    final file = await sftpClient.open('/root/sync/fiadmin1.png',
+  /**
+   * Upload a file to the SSH server
+   */
+  Future<void> uploadFile(SyncFileModel localFile, String remotePath) async {
+    final file = await sftpClient.open(remotePath,
         mode: SftpFileOpenMode.create | SftpFileOpenMode.write);
 
-    await file.write(
-        File('/home/demoncore/Downloads/fiadmin1.png').openRead().cast());
+    print('opened');
 
-    print('File written');
+    await file.write(File(localFile.path).openRead().cast());
 
-    await sftpClient.setStat('/root/sync/fiadmin1.png',
-        SftpFileAttrs(modifyTime: 1520442603, accessTime: 1520442603));
+    print(remotePath + ' uploaded');
 
-    print('File attributes set');
+    await sftpClient.setStat(
+        remotePath,
+        SftpFileAttrs(
+            modifyTime: localFile.modifyTime.millisecondsSinceEpoch ~/ 1000,
+            accessTime: localFile.modifyTime.millisecondsSinceEpoch ~/ 1000));
+
+    print(remotePath + ' modify time set');
   }
 
   Future<SftpFileAttrs> statFile(String path) async {
@@ -75,5 +85,22 @@ class Ssh {
     sftpClient.close();
     client.close();
     await client.done;
+  }
+
+  /**
+   * Get the home directory from the environment
+   */
+  String getHomeDirectory() {
+    String home = "";
+    Map<String, String> envVars = Platform.environment;
+    if (Platform.isMacOS) {
+      home = envVars['HOME'] as String;
+    } else if (Platform.isLinux) {
+      home = envVars['HOME'] as String;
+    } else if (Platform.isWindows) {
+      home = envVars['UserProfile'] as String;
+    }
+
+    return home;
   }
 }

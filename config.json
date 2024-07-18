@@ -5,7 +5,7 @@
     "sync_directorys": [
         {
             "name": "Test",
-            "local_directory": "/home/demoncore/sync"
+            "local_directory": "/home/tsarbomba/sync"
         }
     ]
 }

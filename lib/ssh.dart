@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dartssh2/dartssh2.dart';
+import 'package:private_sync/models/sync_file_model.dart';
 import 'package:private_sync/remote_directory.dart';
 
 class Ssh {
@@ -28,8 +29,8 @@ class Ssh {
     sftpClient = await client.sftp();
   }
 
-  Future<List<RemoteFile>> listDirectory(String path) async {
-    List<RemoteFile> files = [];
+  Future<List<SyncFileModel>> listDirectory(String path) async {
+    List<SyncFileModel> files = [];
 
     var items = await sftpClient.listdir(path);
 
@@ -37,7 +38,7 @@ class Ssh {
       if (item.attr.isFile) {
         int modifiedTimestamp = item.attr.modifyTime as int;
 
-        files.add(RemoteFile(path + '/' + item.filename,
+        files.add(SyncFileModel(path + '/' + item.filename,
             DateTime.fromMillisecondsSinceEpoch(modifiedTimestamp * 1000)));
       }
       if (item.attr.isDirectory &&

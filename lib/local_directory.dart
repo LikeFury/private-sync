@@ -1,8 +1,10 @@
 import 'dart:io';
 
+import 'package:private_sync/models/sync_file_model.dart';
+
 class LocalDirectory {
   String path;
-  List<LocalFile> files = [];
+  List<SyncFileModel> files = [];
   DateTime lastestFileTime = DateTime(1900);
 
   LocalDirectory(this.path);
@@ -20,17 +22,10 @@ class LocalDirectory {
           lastestFileTime = stat.modified;
         }
 
-        files.add(LocalFile(entity.path, stat.modified));
+        files.add(SyncFileModel(entity.path, stat.modified));
       }
     });
 
     return;
   }
-}
-
-class LocalFile {
-  String path;
-  DateTime modifyTime;
-
-  LocalFile(this.path, this.modifyTime);
 }

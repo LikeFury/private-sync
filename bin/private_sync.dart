@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:private_sync/config_model.dart';
 import 'package:private_sync/local_directory.dart';
@@ -36,10 +37,16 @@ Future<void> main() async {
     await remote.parseDirectory();
     print("Remote last change: " + remote.lastestFileTime.toString());
 
+    remote.files.forEach((file) {
+      print(file.path + " " + file.modifyTime.toString());
+    });
+
     if (local.lastestFileTime.isAfter(remote.lastestFileTime)) {
       print("Local is newer");
-    } else {
+    } else if (local.lastestFileTime.isBefore(remote.lastestFileTime)) {
       print("Remote is newer");
+    } else {
+      print("Local and remote are the same");
     }
   });
 

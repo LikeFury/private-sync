@@ -66,6 +66,11 @@ class Ssh {
     return RemoteDirectoryListingModel(files, directories);
   }
 
+  /// Create directory
+  Future<void> createDirectory(String path) async {
+    await sftpClient.mkdir(path);
+  }
+
   /// Upload a file to the SSH server
   Future<void> uploadFile(SyncFileModel localFile, String remotePath) async {
     final file = await sftpClient.open(remotePath,

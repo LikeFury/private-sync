@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:private_sync/local_directory.dart';
+import 'package:private_sync/models/sync_directory_model.dart';
 import 'package:private_sync/models/sync_file_model.dart';
 
 import 'package:private_sync/remote_directory.dart';
@@ -45,5 +46,54 @@ void main() async {
     //Sync().sync(local, remote);
   });
 
-  test('Sync directories', () {});
+  test('Sync directories from local to remote', () async {
+    var remote = MockRemoteDirectory();
+    when(remote.path).thenReturn('/remote/sync/');
+    when(remote.directories)
+        .thenReturn([SyncDirectoryModel('/remote/sync/dir1')]);
+
+    var local = MockLocalDirectory();
+    when(local.path).thenReturn('/home/test/sync/');
+    when(local.directories).thenReturn([
+      SyncDirectoryModel('/home/test/sync/dir1'),
+      SyncDirectoryModel('/home/test/sync/dir2'),
+      SyncDirectoryModel('/home/test/sync/dir1/subdir1'),
+      SyncDirectoryModel('/home/test/sync/dir1/subdir2'),
+      SyncDirectoryModel('/home/test/sync/dir1/subdir2/deepdir1')
+    ]);
+
+    var ssh = MockSsh();
+
+    await Sync(ssh).syncDirectories(local, remote);
+
+    verify(ssh.createDirectory('/remote/sync/dir2')).called(1);
+    verify(ssh.createDirectory('/remote/sync/dir1/subdir1')).called(1);
+    verify(ssh.createDirectory('/remote/sync/dir1/subdir2')).called(1);
+    verify(ssh.createDirectory('/remote/sync/dir1/subdir2/deepdir1')).called(1);
+  });
+
+  test('Sync directories from remote to local', () async {
+    var remote = MockRemoteDirectory();
+    when(remote.path).thenReturn('/remote/sync/');
+    when(remote.directories).thenReturn([
+      SyncDirectoryModel('/remote/sync/dir1'),
+      SyncDirectoryModel('/home/test/sync/dir1/subdir1'),
+      SyncDirectoryModel('/home/test/sync/dir1/subdir2'),
+      SyncDirectoryModel('/home/test/sync/dir1/subdir2/deepdir1')
+    ]);
+
+    var local = MockLocalDirectory();
+    when(local.path).thenReturn('/home/test/sync/');
+    when(local.directories)
+        .thenReturn([SyncDirectoryModel('/home/test/sync/dir1')]);
+
+    var ssh = MockSsh();
+
+    await Sync(ssh).syncDirectories(local, remote);
+
+    verify(ssh.createDirectory('/remote/sync/dir2')).called(1);
+    verify(ssh.createDirectory('/remote/sync/dir1/subdir1')).called(1);
+    verify(ssh.createDirectory('/remote/sync/dir1/subdir2')).called(1);
+    verify(ssh.createDirectory('/remote/sync/dir1/subdir2/deepdir1')).called(1);
+  });
 }

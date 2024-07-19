@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 
 import 'package:private_sync/local_directory.dart';
+import 'package:private_sync/models/sync_directory_model.dart';
 import 'package:private_sync/models/sync_file_model.dart';
 import 'package:private_sync/remote_directory.dart';
 import 'package:private_sync/ssh.dart';
@@ -43,4 +44,34 @@ class Sync {
 
     return;
   }
+
+  /// Sync directories between remote and local
+  Future<void> syncDirectories(
+      LocalDirectory localDirectory, RemoteDirectory remoteDirectory) async {
+    List<SyncDirectoryModel> remoteDirectories = remoteDirectory.directories;
+
+    for (SyncDirectoryModel directory in localDirectory.directories) {
+      var strippedPath = directory.path.substring(localDirectory.path.length);
+
+      // Look for directories on remote
+      SyncDirectoryModel? matchedDirectory = remoteDirectories.firstWhereOrNull(
+          (SyncDirectoryModel remoteDirectory) =>
+              remoteDirectory.path.substring(remoteDirectory.path.length) ==
+              strippedPath);
+
+      // Create a directory if it does not exist
+      if (matchedDirectory == null) {
+        String remotePath = remoteDirectory.path + strippedPath;
+        print('Creating remote directory: $remotePath');
+        await ssh.createDirectory(remotePath);
+      } else {
+        // Remove known directories from the remote list
+        print('Remote directory exists: ${matchedDirectory.path}');
+        remoteDirectories.removeWhere((SyncDirectoryModel remoteDirectory) =>
+            remoteDirectory.path == matchedDirectory.path);
+      }
+    }
+  }
+
+  // Iterate over the remaining remote directories and create local version.
 }

@@ -240,6 +240,16 @@ class MockSsh extends _i1.Mock implements _i4.Ssh {
       ) as _i6.Future<_i3.RemoteDirectoryListingModel>);
 
   @override
+  _i6.Future<void> createDirectory(String? path) => (super.noSuchMethod(
+        Invocation.method(
+          #createDirectory,
+          [path],
+        ),
+        returnValue: _i6.Future<void>.value(),
+        returnValueForMissingStub: _i6.Future<void>.value(),
+      ) as _i6.Future<void>);
+
+  @override
   _i6.Future<void> uploadFile(
     _i7.SyncFileModel? localFile,
     String? remotePath,

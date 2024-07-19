@@ -1,13 +1,19 @@
 import 'dart:io';
 
+import 'package:private_sync/models/sync_directory_model.dart';
 import 'package:private_sync/models/sync_file_model.dart';
+import 'package:private_sync/os.dart';
 
 class LocalDirectory {
-  String path;
+  late String path;
   List<SyncFileModel> files = [];
+  List<SyncDirectoryModel> directories = [];
+
   DateTime lastestFileTime = DateTime(1900);
 
-  LocalDirectory(this.path);
+  LocalDirectory(String path) {
+    this.path = path.replaceAll('~', Os().getHomeDirectory());
+  }
 
   Future<void> parseDirectory() async {
     final dir = Directory(path);
@@ -23,6 +29,8 @@ class LocalDirectory {
         }
 
         files.add(SyncFileModel(entity.path, stat.modified));
+      } else if (entity is Directory) {
+        directories.add(SyncDirectoryModel(entity.path));
       }
     });
 

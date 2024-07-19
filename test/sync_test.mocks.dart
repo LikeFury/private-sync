@@ -3,15 +3,17 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i5;
+import 'dart:async' as _i6;
 
 import 'package:dartssh2/dartssh2.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:mockito/src/dummies.dart' as _i4;
-import 'package:private_sync/local_directory.dart' as _i8;
-import 'package:private_sync/models/sync_file_model.dart' as _i6;
-import 'package:private_sync/remote_directory.dart' as _i7;
-import 'package:private_sync/ssh.dart' as _i3;
+import 'package:mockito/src/dummies.dart' as _i5;
+import 'package:private_sync/local_directory.dart' as _i10;
+import 'package:private_sync/models/remote_directory_listing_model.dart' as _i3;
+import 'package:private_sync/models/sync_directory_model.dart' as _i9;
+import 'package:private_sync/models/sync_file_model.dart' as _i7;
+import 'package:private_sync/remote_directory.dart' as _i8;
+import 'package:private_sync/ssh.dart' as _i4;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -46,8 +48,9 @@ class _FakeSftpClient_1 extends _i1.SmartFake implements _i2.SftpClient {
         );
 }
 
-class _FakeSftpFileAttrs_2 extends _i1.SmartFake implements _i2.SftpFileAttrs {
-  _FakeSftpFileAttrs_2(
+class _FakeRemoteDirectoryListingModel_2 extends _i1.SmartFake
+    implements _i3.RemoteDirectoryListingModel {
+  _FakeRemoteDirectoryListingModel_2(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -56,8 +59,8 @@ class _FakeSftpFileAttrs_2 extends _i1.SmartFake implements _i2.SftpFileAttrs {
         );
 }
 
-class _FakeSsh_3 extends _i1.SmartFake implements _i3.Ssh {
-  _FakeSsh_3(
+class _FakeSftpFileAttrs_3 extends _i1.SmartFake implements _i2.SftpFileAttrs {
+  _FakeSftpFileAttrs_3(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -66,8 +69,18 @@ class _FakeSsh_3 extends _i1.SmartFake implements _i3.Ssh {
         );
 }
 
-class _FakeDateTime_4 extends _i1.SmartFake implements DateTime {
-  _FakeDateTime_4(
+class _FakeSsh_4 extends _i1.SmartFake implements _i4.Ssh {
+  _FakeSsh_4(
+    Object parent,
+    Invocation parentInvocation,
+  ) : super(
+          parent,
+          parentInvocation,
+        );
+}
+
+class _FakeDateTime_5 extends _i1.SmartFake implements DateTime {
+  _FakeDateTime_5(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -79,15 +92,15 @@ class _FakeDateTime_4 extends _i1.SmartFake implements DateTime {
 /// A class which mocks [Ssh].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockSsh extends _i1.Mock implements _i3.Ssh {
+class MockSsh extends _i1.Mock implements _i4.Ssh {
   @override
   String get host => (super.noSuchMethod(
         Invocation.getter(#host),
-        returnValue: _i4.dummyValue<String>(
+        returnValue: _i5.dummyValue<String>(
           this,
           Invocation.getter(#host),
         ),
-        returnValueForMissingStub: _i4.dummyValue<String>(
+        returnValueForMissingStub: _i5.dummyValue<String>(
           this,
           Invocation.getter(#host),
         ),
@@ -105,11 +118,11 @@ class MockSsh extends _i1.Mock implements _i3.Ssh {
   @override
   String get username => (super.noSuchMethod(
         Invocation.getter(#username),
-        returnValue: _i4.dummyValue<String>(
+        returnValue: _i5.dummyValue<String>(
           this,
           Invocation.getter(#username),
         ),
-        returnValueForMissingStub: _i4.dummyValue<String>(
+        returnValueForMissingStub: _i5.dummyValue<String>(
           this,
           Invocation.getter(#username),
         ),
@@ -185,45 +198,88 @@ class MockSsh extends _i1.Mock implements _i3.Ssh {
       );
 
   @override
-  _i5.Future<void> connect() => (super.noSuchMethod(
+  _i6.Future<void> connect() => (super.noSuchMethod(
         Invocation.method(
           #connect,
           [],
         ),
-        returnValue: _i5.Future<void>.value(),
-        returnValueForMissingStub: _i5.Future<void>.value(),
-      ) as _i5.Future<void>);
+        returnValue: _i6.Future<void>.value(),
+        returnValueForMissingStub: _i6.Future<void>.value(),
+      ) as _i6.Future<void>);
 
   @override
-  _i5.Future<List<_i6.SyncFileModel>> listDirectory(String? path) =>
+  _i6.Future<_i3.RemoteDirectoryListingModel> listDirectory(
+    String? path, {
+    int? depth = 0,
+  }) =>
       (super.noSuchMethod(
         Invocation.method(
           #listDirectory,
           [path],
+          {#depth: depth},
         ),
-        returnValue:
-            _i5.Future<List<_i6.SyncFileModel>>.value(<_i6.SyncFileModel>[]),
+        returnValue: _i6.Future<_i3.RemoteDirectoryListingModel>.value(
+            _FakeRemoteDirectoryListingModel_2(
+          this,
+          Invocation.method(
+            #listDirectory,
+            [path],
+            {#depth: depth},
+          ),
+        )),
         returnValueForMissingStub:
-            _i5.Future<List<_i6.SyncFileModel>>.value(<_i6.SyncFileModel>[]),
-      ) as _i5.Future<List<_i6.SyncFileModel>>);
+            _i6.Future<_i3.RemoteDirectoryListingModel>.value(
+                _FakeRemoteDirectoryListingModel_2(
+          this,
+          Invocation.method(
+            #listDirectory,
+            [path],
+            {#depth: depth},
+          ),
+        )),
+      ) as _i6.Future<_i3.RemoteDirectoryListingModel>);
 
   @override
-  _i5.Future<void> writeFile() => (super.noSuchMethod(
+  _i6.Future<void> uploadFile(
+    _i7.SyncFileModel? localFile,
+    String? remotePath,
+  ) =>
+      (super.noSuchMethod(
         Invocation.method(
-          #writeFile,
-          [],
+          #uploadFile,
+          [
+            localFile,
+            remotePath,
+          ],
         ),
-        returnValue: _i5.Future<void>.value(),
-        returnValueForMissingStub: _i5.Future<void>.value(),
-      ) as _i5.Future<void>);
+        returnValue: _i6.Future<void>.value(),
+        returnValueForMissingStub: _i6.Future<void>.value(),
+      ) as _i6.Future<void>);
 
   @override
-  _i5.Future<_i2.SftpFileAttrs> statFile(String? path) => (super.noSuchMethod(
+  _i6.Future<void> downloadFile(
+    _i7.SyncFileModel? remoteFile,
+    String? localPath,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #downloadFile,
+          [
+            remoteFile,
+            localPath,
+          ],
+        ),
+        returnValue: _i6.Future<void>.value(),
+        returnValueForMissingStub: _i6.Future<void>.value(),
+      ) as _i6.Future<void>);
+
+  @override
+  _i6.Future<_i2.SftpFileAttrs> statFile(String? path) => (super.noSuchMethod(
         Invocation.method(
           #statFile,
           [path],
         ),
-        returnValue: _i5.Future<_i2.SftpFileAttrs>.value(_FakeSftpFileAttrs_2(
+        returnValue: _i6.Future<_i2.SftpFileAttrs>.value(_FakeSftpFileAttrs_3(
           this,
           Invocation.method(
             #statFile,
@@ -231,45 +287,45 @@ class MockSsh extends _i1.Mock implements _i3.Ssh {
           ),
         )),
         returnValueForMissingStub:
-            _i5.Future<_i2.SftpFileAttrs>.value(_FakeSftpFileAttrs_2(
+            _i6.Future<_i2.SftpFileAttrs>.value(_FakeSftpFileAttrs_3(
           this,
           Invocation.method(
             #statFile,
             [path],
           ),
         )),
-      ) as _i5.Future<_i2.SftpFileAttrs>);
+      ) as _i6.Future<_i2.SftpFileAttrs>);
 
   @override
-  _i5.Future<void> close() => (super.noSuchMethod(
+  _i6.Future<void> close() => (super.noSuchMethod(
         Invocation.method(
           #close,
           [],
         ),
-        returnValue: _i5.Future<void>.value(),
-        returnValueForMissingStub: _i5.Future<void>.value(),
-      ) as _i5.Future<void>);
+        returnValue: _i6.Future<void>.value(),
+        returnValueForMissingStub: _i6.Future<void>.value(),
+      ) as _i6.Future<void>);
 }
 
 /// A class which mocks [RemoteDirectory].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockRemoteDirectory extends _i1.Mock implements _i7.RemoteDirectory {
+class MockRemoteDirectory extends _i1.Mock implements _i8.RemoteDirectory {
   @override
-  _i3.Ssh get sshClient => (super.noSuchMethod(
+  _i4.Ssh get sshClient => (super.noSuchMethod(
         Invocation.getter(#sshClient),
-        returnValue: _FakeSsh_3(
+        returnValue: _FakeSsh_4(
           this,
           Invocation.getter(#sshClient),
         ),
-        returnValueForMissingStub: _FakeSsh_3(
+        returnValueForMissingStub: _FakeSsh_4(
           this,
           Invocation.getter(#sshClient),
         ),
-      ) as _i3.Ssh);
+      ) as _i4.Ssh);
 
   @override
-  set sshClient(_i3.Ssh? _sshClient) => super.noSuchMethod(
+  set sshClient(_i4.Ssh? _sshClient) => super.noSuchMethod(
         Invocation.setter(
           #sshClient,
           _sshClient,
@@ -280,11 +336,11 @@ class MockRemoteDirectory extends _i1.Mock implements _i7.RemoteDirectory {
   @override
   String get path => (super.noSuchMethod(
         Invocation.getter(#path),
-        returnValue: _i4.dummyValue<String>(
+        returnValue: _i5.dummyValue<String>(
           this,
           Invocation.getter(#path),
         ),
-        returnValueForMissingStub: _i4.dummyValue<String>(
+        returnValueForMissingStub: _i5.dummyValue<String>(
           this,
           Invocation.getter(#path),
         ),
@@ -300,14 +356,14 @@ class MockRemoteDirectory extends _i1.Mock implements _i7.RemoteDirectory {
       );
 
   @override
-  List<_i6.SyncFileModel> get files => (super.noSuchMethod(
+  List<_i7.SyncFileModel> get files => (super.noSuchMethod(
         Invocation.getter(#files),
-        returnValue: <_i6.SyncFileModel>[],
-        returnValueForMissingStub: <_i6.SyncFileModel>[],
-      ) as List<_i6.SyncFileModel>);
+        returnValue: <_i7.SyncFileModel>[],
+        returnValueForMissingStub: <_i7.SyncFileModel>[],
+      ) as List<_i7.SyncFileModel>);
 
   @override
-  set files(List<_i6.SyncFileModel>? _files) => super.noSuchMethod(
+  set files(List<_i7.SyncFileModel>? _files) => super.noSuchMethod(
         Invocation.setter(
           #files,
           _files,
@@ -316,13 +372,30 @@ class MockRemoteDirectory extends _i1.Mock implements _i7.RemoteDirectory {
       );
 
   @override
+  List<_i9.SyncDirectoryModel> get directories => (super.noSuchMethod(
+        Invocation.getter(#directories),
+        returnValue: <_i9.SyncDirectoryModel>[],
+        returnValueForMissingStub: <_i9.SyncDirectoryModel>[],
+      ) as List<_i9.SyncDirectoryModel>);
+
+  @override
+  set directories(List<_i9.SyncDirectoryModel>? _directories) =>
+      super.noSuchMethod(
+        Invocation.setter(
+          #directories,
+          _directories,
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
   DateTime get lastestFileTime => (super.noSuchMethod(
         Invocation.getter(#lastestFileTime),
-        returnValue: _FakeDateTime_4(
+        returnValue: _FakeDateTime_5(
           this,
           Invocation.getter(#lastestFileTime),
         ),
-        returnValueForMissingStub: _FakeDateTime_4(
+        returnValueForMissingStub: _FakeDateTime_5(
           this,
           Invocation.getter(#lastestFileTime),
         ),
@@ -338,28 +411,28 @@ class MockRemoteDirectory extends _i1.Mock implements _i7.RemoteDirectory {
       );
 
   @override
-  _i5.Future<void> parseDirectory() => (super.noSuchMethod(
+  _i6.Future<void> parseDirectory() => (super.noSuchMethod(
         Invocation.method(
           #parseDirectory,
           [],
         ),
-        returnValue: _i5.Future<void>.value(),
-        returnValueForMissingStub: _i5.Future<void>.value(),
-      ) as _i5.Future<void>);
+        returnValue: _i6.Future<void>.value(),
+        returnValueForMissingStub: _i6.Future<void>.value(),
+      ) as _i6.Future<void>);
 }
 
 /// A class which mocks [LocalDirectory].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockLocalDirectory extends _i1.Mock implements _i8.LocalDirectory {
+class MockLocalDirectory extends _i1.Mock implements _i10.LocalDirectory {
   @override
   String get path => (super.noSuchMethod(
         Invocation.getter(#path),
-        returnValue: _i4.dummyValue<String>(
+        returnValue: _i5.dummyValue<String>(
           this,
           Invocation.getter(#path),
         ),
-        returnValueForMissingStub: _i4.dummyValue<String>(
+        returnValueForMissingStub: _i5.dummyValue<String>(
           this,
           Invocation.getter(#path),
         ),
@@ -375,14 +448,14 @@ class MockLocalDirectory extends _i1.Mock implements _i8.LocalDirectory {
       );
 
   @override
-  List<_i6.SyncFileModel> get files => (super.noSuchMethod(
+  List<_i7.SyncFileModel> get files => (super.noSuchMethod(
         Invocation.getter(#files),
-        returnValue: <_i6.SyncFileModel>[],
-        returnValueForMissingStub: <_i6.SyncFileModel>[],
-      ) as List<_i6.SyncFileModel>);
+        returnValue: <_i7.SyncFileModel>[],
+        returnValueForMissingStub: <_i7.SyncFileModel>[],
+      ) as List<_i7.SyncFileModel>);
 
   @override
-  set files(List<_i6.SyncFileModel>? _files) => super.noSuchMethod(
+  set files(List<_i7.SyncFileModel>? _files) => super.noSuchMethod(
         Invocation.setter(
           #files,
           _files,
@@ -391,13 +464,30 @@ class MockLocalDirectory extends _i1.Mock implements _i8.LocalDirectory {
       );
 
   @override
+  List<_i9.SyncDirectoryModel> get directories => (super.noSuchMethod(
+        Invocation.getter(#directories),
+        returnValue: <_i9.SyncDirectoryModel>[],
+        returnValueForMissingStub: <_i9.SyncDirectoryModel>[],
+      ) as List<_i9.SyncDirectoryModel>);
+
+  @override
+  set directories(List<_i9.SyncDirectoryModel>? _directories) =>
+      super.noSuchMethod(
+        Invocation.setter(
+          #directories,
+          _directories,
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
   DateTime get lastestFileTime => (super.noSuchMethod(
         Invocation.getter(#lastestFileTime),
-        returnValue: _FakeDateTime_4(
+        returnValue: _FakeDateTime_5(
           this,
           Invocation.getter(#lastestFileTime),
         ),
-        returnValueForMissingStub: _FakeDateTime_4(
+        returnValueForMissingStub: _FakeDateTime_5(
           this,
           Invocation.getter(#lastestFileTime),
         ),
@@ -413,12 +503,12 @@ class MockLocalDirectory extends _i1.Mock implements _i8.LocalDirectory {
       );
 
   @override
-  _i5.Future<void> parseDirectory() => (super.noSuchMethod(
+  _i6.Future<void> parseDirectory() => (super.noSuchMethod(
         Invocation.method(
           #parseDirectory,
           [],
         ),
-        returnValue: _i5.Future<void>.value(),
-        returnValueForMissingStub: _i5.Future<void>.value(),
-      ) as _i5.Future<void>);
+        returnValue: _i6.Future<void>.value(),
+        returnValueForMissingStub: _i6.Future<void>.value(),
+      ) as _i6.Future<void>);
 }

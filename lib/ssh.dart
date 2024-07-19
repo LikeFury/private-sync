@@ -1,7 +1,10 @@
 import 'dart:io';
 
 import 'package:dartssh2/dartssh2.dart';
+import 'package:private_sync/models/remote_directory_listing_model.dart';
+import 'package:private_sync/models/sync_directory_model.dart';
 import 'package:private_sync/models/sync_file_model.dart';
+import 'package:private_sync/os.dart';
 import 'package:private_sync/remote_directory.dart';
 
 class Ssh {
@@ -20,7 +23,7 @@ class Ssh {
       username: username,
       identities: [
         ...SSHKeyPair.fromPem(
-            await File(getHomeDirectory() + '/.ssh/id_rsa').readAsString())
+            await File(Os().getHomeDirectory() + '/.ssh/id_rsa').readAsString())
       ],
       //onPasswordRequest: () => '<password>',
       //printDebug: (String? message) => print(message)
@@ -29,11 +32,11 @@ class Ssh {
     sftpClient = await client.sftp();
   }
 
-  /**
-   * List Directory
-   */
-  Future<List<SyncFileModel>> listDirectory(String path) async {
+  /// List Directory
+  Future<RemoteDirectoryListingModel> listDirectory(String path,
+      {int depth = 0}) async {
     List<SyncFileModel> files = [];
+    List<SyncDirectoryModel> directories = [];
 
     var items = await sftpClient.listdir(path);
 
@@ -41,32 +44,36 @@ class Ssh {
       if (item.attr.isFile) {
         int modifiedTimestamp = item.attr.modifyTime as int;
 
-        files.add(SyncFileModel(path + '/' + item.filename,
+        files.add(SyncFileModel('$path/${item.filename}',
             DateTime.fromMillisecondsSinceEpoch(modifiedTimestamp * 1000)));
       }
       if (item.attr.isDirectory &&
           item.filename != '.' &&
           item.filename != '..') {
-        files.insertAll(
-            files.length, await listDirectory(path + '/' + item.filename));
+        directories
+            .add(SyncDirectoryModel('$path/${item.filename}', depth: depth));
+
+        RemoteDirectoryListingModel recursiveDirectory =
+            await listDirectory('$path/${item.filename}', depth: depth + 1);
+
+        files.insertAll(files.length, recursiveDirectory.files);
+
+        directories.insertAll(
+            directories.length, recursiveDirectory.directories);
       }
     }
 
-    return files;
+    return RemoteDirectoryListingModel(files, directories);
   }
 
-  /**
-   * Upload a file to the SSH server
-   */
+  /// Upload a file to the SSH server
   Future<void> uploadFile(SyncFileModel localFile, String remotePath) async {
     final file = await sftpClient.open(remotePath,
         mode: SftpFileOpenMode.create | SftpFileOpenMode.write);
 
-    print('opened');
-
     await file.write(File(localFile.path).openRead().cast());
 
-    print(remotePath + ' uploaded');
+    print('$remotePath uploaded');
 
     await sftpClient.setStat(
         remotePath,
@@ -74,9 +81,24 @@ class Ssh {
             modifyTime: localFile.modifyTime.millisecondsSinceEpoch ~/ 1000,
             accessTime: localFile.modifyTime.millisecondsSinceEpoch ~/ 1000));
 
-    print(remotePath + ' modify time set');
+    print('$remotePath modify time set');
   }
 
+  /// Download a file from the SSH server
+  Future<void> downloadFile(SyncFileModel remoteFile, String localPath) async {
+    final file = await sftpClient.open(remoteFile.path);
+
+    final localFile = File(localPath).openWrite();
+    await localFile.addStream(file.read().cast());
+    localFile.flush();
+    localFile.close();
+
+    File(localPath).setLastModified(remoteFile.modifyTime);
+
+    print('$localPath downloaded');
+  }
+
+  /// Stat a file
   Future<SftpFileAttrs> statFile(String path) async {
     return sftpClient.stat(path);
   }
@@ -85,22 +107,5 @@ class Ssh {
     sftpClient.close();
     client.close();
     await client.done;
-  }
-
-  /**
-   * Get the home directory from the environment
-   */
-  String getHomeDirectory() {
-    String home = "";
-    Map<String, String> envVars = Platform.environment;
-    if (Platform.isMacOS) {
-      home = envVars['HOME'] as String;
-    } else if (Platform.isLinux) {
-      home = envVars['HOME'] as String;
-    } else if (Platform.isWindows) {
-      home = envVars['UserProfile'] as String;
-    }
-
-    return home;
   }
 }

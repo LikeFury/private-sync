@@ -11,7 +11,8 @@ class Sync {
 
   Sync(this.ssh);
 
-  Future<void> sync(
+  /// Syncs the files to and from the local and remote directories based on modified timestamps
+  Future<void> syncFiles(
       LocalDirectory localDirectory, RemoteDirectory remoteDirectory) async {
     List<SyncFileModel> remoteFiles = remoteDirectory.files;
 
@@ -25,12 +26,20 @@ class Sync {
 
       if (matchedFile != null &&
           matchedFile.modifyTime.difference(file.modifyTime).inSeconds < 2) {
-        print('Found file on remote with sameish timestamp');
+        print('${file.path} is up to date');
+        remoteFiles
+            .removeWhere((SyncFileModel file) => file.path == matchedFile.path);
       } else {
-        print(file.path + ' not found on server, uploading...');
+        print('${file.path} not found on server, uploading...');
         await ssh.uploadFile(file, remoteDirectory.path + strippedFilePath);
       }
-    } //);
+    }
+
+    for (SyncFileModel file in remoteFiles) {
+      print('${file.path} not found locally, downloading...');
+      var strippedFilePath = file.path.substring(remoteDirectory.path.length);
+      await ssh.downloadFile(file, localDirectory.path + strippedFilePath);
+    }
 
     return;
   }

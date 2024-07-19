@@ -1,0 +1,8 @@
+analyzer:
+  errors:
+    lines_longer_than_80_chars: ignore
+include: package:lints/recommended.yaml
+
+linter:
+  rules:
+    - lines_longer_than_80_chars

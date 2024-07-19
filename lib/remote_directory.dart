@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:private_sync/models/remote_directory_listing_model.dart';
+import 'package:private_sync/models/sync_directory_model.dart';
 import 'package:private_sync/models/sync_file_model.dart';
 import 'package:private_sync/ssh.dart';
 
@@ -7,19 +9,23 @@ class RemoteDirectory {
 
   String path;
   List<SyncFileModel> files = [];
+  List<SyncDirectoryModel> directories = [];
+
   DateTime lastestFileTime = DateTime(1900);
 
   RemoteDirectory(this.sshClient, this.path);
 
   Future<void> parseDirectory() async {
-    List<SyncFileModel> directoryListing = await sshClient.listDirectory(path);
+    RemoteDirectoryListingModel directoryListing =
+        await sshClient.listDirectory(path);
 
-    directoryListing.forEach((SyncFileModel file) {
+    directoryListing.files.forEach((SyncFileModel file) {
       if (file.modifyTime.isAfter(lastestFileTime)) {
         lastestFileTime = file.modifyTime;
       }
     });
 
-    files = directoryListing;
+    directories = directoryListing.directories;
+    files = directoryListing.files;
   }
 }

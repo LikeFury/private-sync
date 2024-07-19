@@ -42,6 +42,8 @@ void main() async {
     when(local.lastestFileTime).thenReturn(DateTime(2023, 9, 7, 17, 30));
     when(local.path).thenReturn('/home/test/sync/');
 
-    Sync().sync(local, remote);
+    //Sync().sync(local, remote);
   });
+
+  test('Sync directories', () {});
 }

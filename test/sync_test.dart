@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:file/memory.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:private_sync/local_directory.dart';
@@ -19,7 +20,7 @@ import 'sync_test.mocks.dart';
 
 void main() async {
   test('Sync local to remote', () async {
-    var remote = MockRemoteDirectory();
+    /*var remote = MockRemoteDirectory();
 
     remote.files.add(
         SyncFileModel('/remote/test/sync/file1', DateTime(2020, 9, 7, 17, 30)));
@@ -42,7 +43,7 @@ void main() async {
 
     when(local.lastestFileTime).thenReturn(DateTime(2023, 9, 7, 17, 30));
     when(local.path).thenReturn('/home/test/sync/');
-
+*/
     //Sync().sync(local, remote);
   });
 
@@ -64,8 +65,12 @@ void main() async {
 
     var ssh = MockSsh();
 
-    await Sync(ssh).syncDirectories(local, remote);
+    var memoryFileSystem = MemoryFileSystem();
+    memoryFileSystem.directory('/home/test/sync').createSync(recursive: true);
 
+    await Sync(ssh, memoryFileSystem).syncDirectories(local, remote);
+
+    verifyNever(ssh.createDirectory('/remote/sync/dir1'));
     verify(ssh.createDirectory('/remote/sync/dir2')).called(1);
     verify(ssh.createDirectory('/remote/sync/dir1/subdir1')).called(1);
     verify(ssh.createDirectory('/remote/sync/dir1/subdir2')).called(1);
@@ -77,9 +82,9 @@ void main() async {
     when(remote.path).thenReturn('/remote/sync/');
     when(remote.directories).thenReturn([
       SyncDirectoryModel('/remote/sync/dir1'),
-      SyncDirectoryModel('/home/test/sync/dir1/subdir1'),
-      SyncDirectoryModel('/home/test/sync/dir1/subdir2'),
-      SyncDirectoryModel('/home/test/sync/dir1/subdir2/deepdir1')
+      SyncDirectoryModel('/remote/sync/dir1/subdir1'),
+      SyncDirectoryModel('/remote/sync/dir1/subdir2'),
+      SyncDirectoryModel('/remote/sync/dir1/subdir2/deepdir1')
     ]);
 
     var local = MockLocalDirectory();
@@ -88,12 +93,23 @@ void main() async {
         .thenReturn([SyncDirectoryModel('/home/test/sync/dir1')]);
 
     var ssh = MockSsh();
+    var memoryFileSystem = MemoryFileSystem();
+    memoryFileSystem
+        .directory('/home/test/sync/dir1')
+        .createSync(recursive: true);
 
-    await Sync(ssh).syncDirectories(local, remote);
+    await Sync(ssh, memoryFileSystem).syncDirectories(local, remote);
 
-    verify(ssh.createDirectory('/remote/sync/dir2')).called(1);
-    verify(ssh.createDirectory('/remote/sync/dir1/subdir1')).called(1);
-    verify(ssh.createDirectory('/remote/sync/dir1/subdir2')).called(1);
-    verify(ssh.createDirectory('/remote/sync/dir1/subdir2/deepdir1')).called(1);
+    expect(
+        memoryFileSystem.directory('/home/test/sync/dir1/subdir1').existsSync(),
+        true);
+    expect(
+        memoryFileSystem.directory('/home/test/sync/dir1/subdir2').existsSync(),
+        true);
+    expect(
+        memoryFileSystem
+            .directory('/home/test/sync/dir1/subdir2/deepdir1')
+            .existsSync(),
+        true);
   });
 }

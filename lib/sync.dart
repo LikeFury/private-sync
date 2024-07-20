@@ -1,5 +1,5 @@
-import 'dart:io';
 import 'package:collection/collection.dart';
+import 'package:file/file.dart';
 
 import 'package:private_sync/local_directory.dart';
 import 'package:private_sync/models/sync_directory_model.dart';
@@ -9,8 +9,9 @@ import 'package:private_sync/ssh.dart';
 
 class Sync {
   Ssh ssh;
+  FileSystem fileSystem;
 
-  Sync(this.ssh);
+  Sync(this.ssh, this.fileSystem);
 
   /// Syncs the files to and from the local and remote directories based on modified timestamps
   Future<void> syncFiles(
@@ -50,13 +51,17 @@ class Sync {
       LocalDirectory localDirectory, RemoteDirectory remoteDirectory) async {
     List<SyncDirectoryModel> remoteDirectories = remoteDirectory.directories;
 
+    // Sorty by depth to ensure we create directories in the correct order
+    remoteDirectories.sort((a, b) => a.depth.compareTo(b.depth));
+    localDirectory.directories.sort((a, b) => a.depth.compareTo(b.depth));
+
     for (SyncDirectoryModel directory in localDirectory.directories) {
       var strippedPath = directory.path.substring(localDirectory.path.length);
 
       // Look for directories on remote
       SyncDirectoryModel? matchedDirectory = remoteDirectories.firstWhereOrNull(
-          (SyncDirectoryModel remoteDirectory) =>
-              remoteDirectory.path.substring(remoteDirectory.path.length) ==
+          (SyncDirectoryModel directory) =>
+              directory.path.substring(remoteDirectory.path.length) ==
               strippedPath);
 
       // Create a directory if it does not exist
@@ -71,7 +76,13 @@ class Sync {
             remoteDirectory.path == matchedDirectory.path);
       }
     }
-  }
 
-  // Iterate over the remaining remote directories and create local version.
+    // Iterate over the remaining remote directories and create local version.
+    for (SyncDirectoryModel directory in remoteDirectories) {
+      var strippedPath = directory.path.substring(remoteDirectory.path.length);
+
+      print('Creating local directory: ${localDirectory.path + strippedPath}');
+      fileSystem.directory(localDirectory.path + strippedPath).createSync();
+    }
+  }
 }

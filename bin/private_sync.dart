@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:file/local.dart';
 import 'package:private_sync/models/config_model.dart';
 import 'package:private_sync/local_directory.dart';
 import 'package:private_sync/models/sync_directory_model.dart';
@@ -45,16 +46,15 @@ Future<void> main() async {
     await remote.parseDirectory();
     print("Remote last change: ${remote.lastestFileTime}");
 
-    remote.directories.forEach((SyncDirectoryModel directory) {
-      print(directory.path + ' ' + directory.depth.toString());
-    });
-
     int diff =
         local.lastestFileTime.difference(remote.lastestFileTime).inSeconds;
 
     if (diff > 1 || diff < -1 || local.files.length != remote.files.length) {
       print("Sync needed");
-      //await Sync(sshClient).syncFiles(local, remote);
+
+      Sync sync = Sync(sshClient, LocalFileSystem());
+      await sync.syncDirectories(local, remote);
+      await sync.syncFiles(local, remote);
     } else {
       print("No sync needed");
     }

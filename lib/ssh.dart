@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dartssh2/dartssh2.dart';
+import 'package:private_sync/models/config_model.dart';
 import 'package:private_sync/models/remote_directory_listing_model.dart';
 import 'package:private_sync/models/sync_directory_model.dart';
 import 'package:private_sync/models/sync_file_model.dart';
@@ -8,19 +9,17 @@ import 'package:private_sync/os.dart';
 import 'package:private_sync/remote_directory.dart';
 
 class Ssh {
-  String host;
-  String username;
-  int port;
+  ConfigModel config;
 
-  Ssh({required this.host, this.port = 22, required this.username});
+  Ssh({required this.config});
 
   late SSHClient client;
   late SftpClient sftpClient;
 
   Future<void> connect() async {
     client = SSHClient(
-      await SSHSocket.connect(host, port),
-      username: username,
+      await SSHSocket.connect(config.hostname, config.port),
+      username: config.username,
       identities: [
         ...SSHKeyPair.fromPem(
             await File(Os().getHomeDirectory() + '/.ssh/id_rsa').readAsString())

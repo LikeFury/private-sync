@@ -7,16 +7,16 @@ class ConfigModel {
   String remoteDirectory;
   String? password;
   String? privateKeyDirectory;
-  List<ConfigSyncPathModel> syncDirectorys;
+  List<ConfigSyncPathModel>? syncDirectorys;
 
   ConfigModel(
       {required this.hostname,
       this.port = 22,
       required this.username,
-      this.password = null,
+      this.password,
       required this.remoteDirectory,
-      this.privateKeyDirectory = null,
-      required this.syncDirectorys});
+      this.privateKeyDirectory,
+      this.syncDirectorys});
 
   Map<String, dynamic> toMap() {
     return {
@@ -25,7 +25,8 @@ class ConfigModel {
       'username': username,
       'password': password,
       'remote_directory': remoteDirectory,
-      'private_key_directory': privateKeyDirectory
+      'private_key_directory': privateKeyDirectory,
+      'sync_directories': []
     };
   }
 
@@ -37,7 +38,7 @@ class ConfigModel {
         password: map['passsword'],
         remoteDirectory: map['remote_directory'],
         privateKeyDirectory: map['private_key_directory'],
-        syncDirectorys: map['sync_directorys']
+        syncDirectorys: map['sync_directories']
             .map<ConfigSyncPathModel>(
                 (sync) => ConfigSyncPathModel.fromMap(sync))
             .toList());

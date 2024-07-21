@@ -3,7 +3,11 @@ import 'dart:developer';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:args/args.dart';
+import 'package:args/command_runner.dart';
 import 'package:file/local.dart';
+import 'package:private_sync/commands/server_command.dart';
+import 'package:private_sync/config.dart';
 import 'package:private_sync/models/config_model.dart';
 import 'package:private_sync/local_directory.dart';
 import 'package:private_sync/models/sync_directory_model.dart';
@@ -12,8 +16,33 @@ import 'package:private_sync/remote_directory.dart';
 import 'package:private_sync/ssh.dart';
 import 'package:private_sync/sync.dart';
 
-Future<void> main() async {
-  print('Private Sync');
+Future<void> main(List<String> args) async {
+  Config config = Config();
+  late ConfigModel configModel;
+
+  if (config.exists()) {
+    configModel = config.loadConfig();
+  } else {
+    print('No config file found, creating it now');
+    configModel = ConfigModel(hostname: '', username: '', remoteDirectory: '');
+    config.writeConfig(configModel);
+  }
+
+  CommandRunner("private-sync",
+      "Private Sync: sync files between PCs via your SSH server")
+    ..addCommand(ServerCommand(configModel))
+    ..argParser.addFlag('verbose',
+        abbr: 'v',
+        defaultsTo: false,
+        help: "Show detailed logs",
+        negatable: false)
+    ..run(args);
+
+  //print(runner.);
+
+  return;
+
+  /*print('Private Sync');
 
   var input = await File('config.json').readAsString();
   var map = jsonDecode(input);
@@ -34,10 +63,6 @@ Future<void> main() async {
     await local.parseDirectory();
 
     print("Latest local change: ${local.lastestFileTime}");
-
-    /*local.files.forEach((file) {
-      print(file.path + " " + file.modifyTime.toString());
-    });*/
 
     print('Remote directory: ${config.remoteDirectory}/${directory.name}');
 
@@ -60,5 +85,5 @@ Future<void> main() async {
     }
   });
 
-  await sshClient.close();
+  await sshClient.close();*/
 }

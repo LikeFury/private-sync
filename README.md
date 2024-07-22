@@ -5,6 +5,6 @@ Sync files between PCs using your SSH server. No need for third party cloud prov
 Contact me on my website [likefury.com](https://likefury.com).
 
 ### To Do
-Handle file deleteion
-Better docs
-A guide
+1. Handle file deleteion
+2. Better docs
+3. A detailed guide

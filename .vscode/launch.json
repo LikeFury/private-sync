@@ -4,11 +4,13 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        
         {
+            "program": "bin/private_sync.dart",
+            "args": ["directory", "-a"],
             "name": "private-sync",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "console": "terminal"
         }
     ]
 }

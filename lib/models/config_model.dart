@@ -1,4 +1,4 @@
-import 'package:private_sync/models/config_sync_path_model.dart';
+import 'package:private_sync/models/config_directory_model.dart';
 
 class ConfigModel {
   String hostname;
@@ -7,7 +7,7 @@ class ConfigModel {
   String remoteDirectory;
   String? password;
   String? privateKeyDirectory;
-  List<ConfigSyncPathModel>? syncDirectorys;
+  List<ConfigDirectoryModel> syncDirectories;
 
   ConfigModel(
       {required this.hostname,
@@ -16,7 +16,7 @@ class ConfigModel {
       this.password,
       required this.remoteDirectory,
       this.privateKeyDirectory,
-      this.syncDirectorys});
+      this.syncDirectories = const []});
 
   Map<String, dynamic> toMap() {
     return {
@@ -27,13 +27,9 @@ class ConfigModel {
       'remote_directory': remoteDirectory,
       'private_key_directory': privateKeyDirectory,
       'sync_directories':
-          syncDirectorys?.map((ConfigSyncPathModel sync) => sync.toMap())
+          syncDirectories.map((directory) => directory.toMap()).toList()
     };
   }
-
-/*appUsers: map['admin_users']
-            .map<AppUserIndexModel>((user) => AppUserIndexModel.fromMap(user))
-            .toList());*/
 
   factory ConfigModel.fromMap(Map<String, dynamic> map) {
     return ConfigModel(
@@ -43,9 +39,9 @@ class ConfigModel {
         password: map['passsword'],
         remoteDirectory: map['remote_directory'],
         privateKeyDirectory: map['private_key_directory'],
-        syncDirectorys: map['sync_directories']
-            .map<ConfigSyncPathModel>(
-                (sync) => ConfigSyncPathModel.fromMap(sync))
+        syncDirectories: map['sync_directories']
+            .map<ConfigDirectoryModel>(
+                (sync) => ConfigDirectoryModel.fromMap(sync))
             .toList());
   }
 }

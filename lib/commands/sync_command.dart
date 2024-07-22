@@ -14,7 +14,7 @@ class SyncCommand extends Command {
 
   ConfigModel config;
 
-  ServerCommand(this.config) {
+  SyncCommand(this.config) {
     // we can add command specific arguments here.
     // [argParser] is automatically created by the parent class.
     argParser.addFlag('show',

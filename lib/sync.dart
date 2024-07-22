@@ -85,4 +85,12 @@ class Sync {
       fileSystem.directory(localDirectory.path + strippedPath).createSync();
     }
   }
+
+  Future<void> checkRemoteStoreDirectory(String path) async {
+    try {
+      await ssh.statFile(path);
+    } catch (e) {
+      await ssh.createDirectory(path);
+    }
+  }
 }

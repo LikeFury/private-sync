@@ -1,99 +1,71 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
+import 'package:file/local.dart';
 import 'package:private_sync/config.dart';
+import 'package:private_sync/local_directory.dart';
+import 'package:private_sync/models/config_directory_model.dart';
 import 'package:private_sync/models/config_model.dart';
+import 'package:private_sync/remote_directory.dart';
 import 'package:private_sync/ssh.dart';
+import 'package:private_sync/sync.dart';
 
 class SyncCommand extends Command {
-  // The [name] and [description] properties must be defined by every
-  // subclass.
   @override
   final name = "sync";
   @override
-  final description = "Set the SSH server you wish to use";
+  final description = "Perform a sync to the SSH server";
 
   ConfigModel config;
 
-  SyncCommand(this.config) {
-    // we can add command specific arguments here.
-    // [argParser] is automatically created by the parent class.
-    argParser.addFlag('show',
-        abbr: 's',
-        help: "Show current SSH server configuration",
-        negatable: false);
-    argParser.addFlag('hostname',
-        abbr: 'n', help: "Set SSH hostname", negatable: false);
-    argParser.addFlag('username',
-        abbr: 'u', help: "Set SSH username", negatable: false);
-    argParser.addFlag('port',
-        abbr: 'p', help: "Set SSH port", negatable: false);
-    argParser.addFlag('directory',
-        abbr: 'd', help: "Set path on SSH server to store", negatable: false);
-    argParser.addFlag('test',
-        abbr: 't', help: "Test connectivity to SSH server", negatable: false);
-  }
+  SyncCommand(this.config);
 
   @override
   void run() async {
-    if (argResults!.flag('show')) {
-      print("Hostname: ${config.hostname}");
-      print("Username: ${config.username}");
-      print("Port: ${config.port}");
-      print("Remote Directory: ${config.remoteDirectory}");
-    }
+    print('Private Sync');
 
-    if (argResults!.flag('hostname')) {
-      config.hostname = argResults!.rest[0];
-      Config().writeConfig(config);
-      print("Hostname set to: ${config.hostname}");
-    }
+    ConfigModel config = Config().loadConfig();
 
-    if (argResults!.flag('username')) {
-      config.username = argResults!.rest[0];
-      Config().writeConfig(config);
-      print("Username set to: ${config.username}");
-    }
+    Ssh sshClient = Ssh(config: config);
 
-    if (argResults!.flag('port')) {
-      try {
-        config.port = int.parse(argResults!.rest[0]);
-        Config().writeConfig(config);
-        print("Port set to: ${config.port}");
-      } catch (error) {
-        print("Port must be a number!");
+    print("Connecting to ${config.hostname}");
+
+    await sshClient.connect();
+
+    Sync sync = Sync(sshClient, LocalFileSystem());
+
+    await Future.forEach(config.syncDirectories,
+        (ConfigDirectoryModel directory) async {
+      print("Syncing ${directory.name} ${directory.localDirectory}");
+
+      var local = LocalDirectory(directory.localDirectory);
+      await local.parseDirectory();
+
+      print("Latest local change: ${local.lastestFileTime}");
+
+      print('Remote directory: ${config.remoteDirectory}/${directory.name}/');
+
+      await sync.checkRemoteStoreDirectory(
+          '${config.remoteDirectory}/${directory.name}');
+
+      var remote = RemoteDirectory(
+          sshClient, '${config.remoteDirectory}/${directory.name}/');
+      await remote.parseDirectory();
+      print("Remote last change: ${remote.lastestFileTime}");
+
+      int diff =
+          local.lastestFileTime.difference(remote.lastestFileTime).inSeconds;
+
+      if (diff > 1 || diff < -1 || local.files.length != remote.files.length) {
+        print("Sync needed");
+
+        await sync.syncDirectories(local, remote);
+        await sync.syncFiles(local, remote);
+      } else {
+        print("No sync needed");
       }
-    }
+    });
 
-    if (argResults!.flag('directory')) {
-      config.remoteDirectory = argResults!.rest[0];
-      Config().writeConfig(config);
-      print("SSH directory set to: ${config.remoteDirectory}");
-    }
-
-    if (argResults!.flag('test')) {
-      Ssh sshClient = Ssh(config: config);
-      try {
-        await sshClient.connect();
-        print("Successfully connected");
-      } catch (e) {
-        print("Connection error: $e");
-        await sshClient.close();
-        exit(1);
-      }
-
-      try {
-        sshClient.createDirectory("${config.remoteDirectory}/test");
-        sshClient.deleteDirectory("${config.remoteDirectory}/test");
-        print('Remote directory is writable');
-      } catch (e) {
-        print("Directory error: $e");
-        print("Ensure the remote directory exists and is writable");
-        await sshClient.close();
-        exit(1);
-      }
-
-      await sshClient.close();
-    }
+    await sshClient.close();
   }
 }

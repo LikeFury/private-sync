@@ -26,9 +26,14 @@ class ConfigModel {
       'password': password,
       'remote_directory': remoteDirectory,
       'private_key_directory': privateKeyDirectory,
-      'sync_directories': []
+      'sync_directories':
+          syncDirectorys?.map((ConfigSyncPathModel sync) => sync.toMap())
     };
   }
+
+/*appUsers: map['admin_users']
+            .map<AppUserIndexModel>((user) => AppUserIndexModel.fromMap(user))
+            .toList());*/
 
   factory ConfigModel.fromMap(Map<String, dynamic> map) {
     return ConfigModel(

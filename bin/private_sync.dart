@@ -6,6 +6,7 @@ import 'dart:math';
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:file/local.dart';
+import 'package:private_sync/commands/directory_command.dart';
 import 'package:private_sync/commands/server_command.dart';
 import 'package:private_sync/config.dart';
 import 'package:private_sync/models/config_model.dart';
@@ -31,6 +32,7 @@ Future<void> main(List<String> args) async {
   CommandRunner("private-sync",
       "Private Sync: sync files between PCs via your SSH server")
     ..addCommand(ServerCommand(configModel))
+    ..addCommand(DirectoryCommand(configModel))
     ..argParser.addFlag('verbose',
         abbr: 'v',
         defaultsTo: false,

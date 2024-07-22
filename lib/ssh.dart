@@ -70,6 +70,11 @@ class Ssh {
     await sftpClient.mkdir(path);
   }
 
+  /// Delete directory
+  Future<void> deleteDirectory(String path) async {
+    await sftpClient.rmdir(path);
+  }
+
   /// Upload a file to the SSH server
   Future<void> uploadFile(SyncFileModel localFile, String remotePath) async {
     final file = await sftpClient.open(remotePath,

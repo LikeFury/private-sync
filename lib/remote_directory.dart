@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:private_sync/models/remote_directory_listing_model.dart';
 import 'package:private_sync/models/sync_directory_model.dart';
 import 'package:private_sync/models/sync_file_model.dart';
@@ -19,11 +18,11 @@ class RemoteDirectory {
     RemoteDirectoryListingModel directoryListing =
         await sshClient.listDirectory(path);
 
-    directoryListing.files.forEach((SyncFileModel file) {
+    for (var file in directoryListing.files) {
       if (file.modifyTime.isAfter(lastestFileTime)) {
         lastestFileTime = file.modifyTime;
       }
-    });
+    }
 
     directories = directoryListing.directories;
     files = directoryListing.files;

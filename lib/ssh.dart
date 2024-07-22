@@ -6,7 +6,6 @@ import 'package:private_sync/models/remote_directory_listing_model.dart';
 import 'package:private_sync/models/sync_directory_model.dart';
 import 'package:private_sync/models/sync_file_model.dart';
 import 'package:private_sync/os.dart';
-import 'package:private_sync/remote_directory.dart';
 
 class Ssh {
   ConfigModel config;
@@ -22,7 +21,7 @@ class Ssh {
       username: config.username,
       identities: [
         ...SSHKeyPair.fromPem(
-            await File(Os().getHomeDirectory() + '/.ssh/id_rsa').readAsString())
+            await File('${Os().getHomeDirectory()}/.ssh/id_rsa').readAsString())
       ],
       //onPasswordRequest: () => '<password>',
       //printDebug: (String? message) => print(message)

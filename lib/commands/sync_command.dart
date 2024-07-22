@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
-import 'package:dartssh2/dartssh2.dart';
 import 'package:private_sync/config.dart';
 import 'package:private_sync/models/config_model.dart';
 import 'package:private_sync/ssh.dart';
@@ -9,7 +8,9 @@ import 'package:private_sync/ssh.dart';
 class SyncCommand extends Command {
   // The [name] and [description] properties must be defined by every
   // subclass.
+  @override
   final name = "sync";
+  @override
   final description = "Set the SSH server you wish to use";
 
   ConfigModel config;

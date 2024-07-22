@@ -1,12 +1,9 @@
-import 'dart:developer';
-import 'dart:io';
 
 import 'package:file/memory.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:private_sync/local_directory.dart';
 import 'package:private_sync/models/sync_directory_model.dart';
-import 'package:private_sync/models/sync_file_model.dart';
 
 import 'package:private_sync/remote_directory.dart';
 import 'package:private_sync/ssh.dart';

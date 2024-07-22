@@ -1,7 +1,5 @@
-import 'dart:io';
 
 import 'package:args/command_runner.dart';
-import 'package:private_sync/config.dart';
 import 'package:private_sync/models/config_model.dart';
 import 'package:private_sync/models/config_directory_model.dart';
 

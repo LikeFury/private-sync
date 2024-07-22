@@ -1,21 +1,9 @@
-import 'dart:convert';
-import 'dart:developer';
-import 'dart:io';
-import 'dart:math';
 
-import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
-import 'package:file/local.dart';
 import 'package:private_sync/commands/directory_command.dart';
 import 'package:private_sync/commands/server_command.dart';
 import 'package:private_sync/config.dart';
 import 'package:private_sync/models/config_model.dart';
-import 'package:private_sync/local_directory.dart';
-import 'package:private_sync/models/sync_directory_model.dart';
-import 'package:private_sync/models/sync_file_model.dart';
-import 'package:private_sync/remote_directory.dart';
-import 'package:private_sync/ssh.dart';
-import 'package:private_sync/sync.dart';
 
 Future<void> main(List<String> args) async {
   Config config = Config();

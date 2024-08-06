@@ -6,17 +6,21 @@ import 'package:private_sync/ssh.dart';
 class RemoteDirectory {
   Ssh sshClient;
 
-  String path;
+  late String path;
   List<SyncFileModel> files = [];
   List<SyncDirectoryModel> directories = [];
 
   DateTime lastestFileTime = DateTime(1900);
 
-  RemoteDirectory(this.sshClient, this.path);
+  RemoteDirectory(this.sshClient, this.path) {
+    var lastPathChar = path.substring(path.length - 1);
+    if (lastPathChar != '/') {
+      path = "$path/";
+    }
+  }
 
   Future<void> parseDirectory() async {
-    RemoteDirectoryListingModel directoryListing =
-        await sshClient.listDirectory(path);
+    RemoteDirectoryListingModel directoryListing = await sshClient.listDirectory(path);
 
     for (var file in directoryListing.files) {
       if (file.modifyTime.isAfter(lastestFileTime)) {

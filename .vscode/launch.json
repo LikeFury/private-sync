@@ -6,7 +6,7 @@
     "configurations": [
         {
             "program": "bin/private_sync.dart",
-            "args": ["directory", "-a"],
+            "args": ["sync"],
             "name": "private-sync",
             "request": "launch",
             "type": "dart",

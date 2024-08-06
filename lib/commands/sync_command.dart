@@ -1,4 +1,3 @@
-
 import 'package:args/command_runner.dart';
 import 'package:file/local.dart';
 import 'package:private_sync/config.dart';
@@ -33,8 +32,7 @@ class SyncCommand extends Command {
 
     Sync sync = Sync(sshClient, LocalFileSystem());
 
-    await Future.forEach(config.syncDirectories,
-        (ConfigDirectoryModel directory) async {
+    await Future.forEach(config.syncDirectories, (ConfigDirectoryModel directory) async {
       print("Syncing ${directory.name} ${directory.localDirectory}");
 
       var local = LocalDirectory(directory.localDirectory);
@@ -44,16 +42,13 @@ class SyncCommand extends Command {
 
       print('Remote directory: ${config.remoteDirectory}/${directory.name}/');
 
-      await sync.checkRemoteStoreDirectory(
-          '${config.remoteDirectory}/${directory.name}');
+      await sync.checkRemoteStoreDirectory('${config.remoteDirectory}/${directory.name}');
 
-      var remote = RemoteDirectory(
-          sshClient, '${config.remoteDirectory}/${directory.name}/');
+      var remote = RemoteDirectory(sshClient, '${config.remoteDirectory}/${directory.name}/');
       await remote.parseDirectory();
       print("Remote last change: ${remote.lastestFileTime}");
 
-      int diff =
-          local.lastestFileTime.difference(remote.lastestFileTime).inSeconds;
+      int diff = local.lastestFileTime.difference(remote.lastestFileTime).inSeconds;
 
       if (diff > 1 || diff < -1 || local.files.length != remote.files.length) {
         print("Sync needed");

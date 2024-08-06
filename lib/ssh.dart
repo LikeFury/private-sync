@@ -19,10 +19,7 @@ class Ssh {
     client = SSHClient(
       await SSHSocket.connect(config.hostname, config.port),
       username: config.username,
-      identities: [
-        ...SSHKeyPair.fromPem(
-            await File('${Os().getHomeDirectory()}/.ssh/id_rsa').readAsString())
-      ],
+      identities: [...SSHKeyPair.fromPem(await File('${Os().getHomeDirectory()}/.ssh/id_rsa').readAsString())],
       //onPasswordRequest: () => '<password>',
       //printDebug: (String? message) => print(message)
     );
@@ -31,8 +28,7 @@ class Ssh {
   }
 
   /// List Directory
-  Future<RemoteDirectoryListingModel> listDirectory(String path,
-      {int depth = 0}) async {
+  Future<RemoteDirectoryListingModel> listDirectory(String path, {int depth = 0}) async {
     List<SyncFileModel> files = [];
     List<SyncDirectoryModel> directories = [];
 
@@ -41,23 +37,18 @@ class Ssh {
     for (final item in items) {
       if (item.attr.isFile) {
         int modifiedTimestamp = item.attr.modifyTime as int;
-
-        files.add(SyncFileModel('$path/${item.filename}',
-            DateTime.fromMillisecondsSinceEpoch(modifiedTimestamp * 1000)));
+        files.add(
+            SyncFileModel('$path${item.filename}', DateTime.fromMillisecondsSinceEpoch(modifiedTimestamp * 1000)));
       }
-      if (item.attr.isDirectory &&
-          item.filename != '.' &&
-          item.filename != '..') {
-        directories
-            .add(SyncDirectoryModel('$path/${item.filename}', depth: depth));
+      if (item.attr.isDirectory && item.filename != '.' && item.filename != '..') {
+        directories.add(SyncDirectoryModel('$path${item.filename}', depth: depth));
 
         RemoteDirectoryListingModel recursiveDirectory =
-            await listDirectory('$path/${item.filename}', depth: depth + 1);
+            await listDirectory('$path${item.filename}/', depth: depth + 1);
 
         files.insertAll(files.length, recursiveDirectory.files);
 
-        directories.insertAll(
-            directories.length, recursiveDirectory.directories);
+        directories.insertAll(directories.length, recursiveDirectory.directories);
       }
     }
 
@@ -76,8 +67,7 @@ class Ssh {
 
   /// Upload a file to the SSH server
   Future<void> uploadFile(SyncFileModel localFile, String remotePath) async {
-    final file = await sftpClient.open(remotePath,
-        mode: SftpFileOpenMode.create | SftpFileOpenMode.write);
+    final file = await sftpClient.open(remotePath, mode: SftpFileOpenMode.create | SftpFileOpenMode.write);
 
     await file.write(File(localFile.path).openRead().cast());
 

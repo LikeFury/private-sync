@@ -60,6 +60,7 @@ class SyncCommand extends Command {
       }
     });
 
+    print('Finished');
     await sshClient.close();
   }
 }

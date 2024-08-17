@@ -5,7 +5,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i6;
 
-import 'package:dartssh2/dartssh2.dart' as _i3;
+import 'package:dartssh3/dartssh3.dart' as _i3;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i9;
 import 'package:private_sync/local_directory.dart' as _i11;
@@ -59,8 +59,7 @@ class _FakeSftpClient_2 extends _i1.SmartFake implements _i3.SftpClient {
         );
 }
 
-class _FakeRemoteDirectoryListingModel_3 extends _i1.SmartFake
-    implements _i4.RemoteDirectoryListingModel {
+class _FakeRemoteDirectoryListingModel_3 extends _i1.SmartFake implements _i4.RemoteDirectoryListingModel {
   _FakeRemoteDirectoryListingModel_3(
     Object parent,
     Invocation parentInvocation,
@@ -191,8 +190,7 @@ class MockSsh extends _i1.Mock implements _i5.Ssh {
           [path],
           {#depth: depth},
         ),
-        returnValue: _i6.Future<_i4.RemoteDirectoryListingModel>.value(
-            _FakeRemoteDirectoryListingModel_3(
+        returnValue: _i6.Future<_i4.RemoteDirectoryListingModel>.value(_FakeRemoteDirectoryListingModel_3(
           this,
           Invocation.method(
             #listDirectory,
@@ -200,9 +198,7 @@ class MockSsh extends _i1.Mock implements _i5.Ssh {
             {#depth: depth},
           ),
         )),
-        returnValueForMissingStub:
-            _i6.Future<_i4.RemoteDirectoryListingModel>.value(
-                _FakeRemoteDirectoryListingModel_3(
+        returnValueForMissingStub: _i6.Future<_i4.RemoteDirectoryListingModel>.value(_FakeRemoteDirectoryListingModel_3(
           this,
           Invocation.method(
             #listDirectory,
@@ -279,8 +275,7 @@ class MockSsh extends _i1.Mock implements _i5.Ssh {
             [path],
           ),
         )),
-        returnValueForMissingStub:
-            _i6.Future<_i3.SftpFileAttrs>.value(_FakeSftpFileAttrs_4(
+        returnValueForMissingStub: _i6.Future<_i3.SftpFileAttrs>.value(_FakeSftpFileAttrs_4(
           this,
           Invocation.method(
             #statFile,
@@ -372,8 +367,7 @@ class MockRemoteDirectory extends _i1.Mock implements _i8.RemoteDirectory {
       ) as List<_i10.SyncDirectoryModel>);
 
   @override
-  set directories(List<_i10.SyncDirectoryModel>? _directories) =>
-      super.noSuchMethod(
+  set directories(List<_i10.SyncDirectoryModel>? _directories) => super.noSuchMethod(
         Invocation.setter(
           #directories,
           _directories,
@@ -464,8 +458,7 @@ class MockLocalDirectory extends _i1.Mock implements _i11.LocalDirectory {
       ) as List<_i10.SyncDirectoryModel>);
 
   @override
-  set directories(List<_i10.SyncDirectoryModel>? _directories) =>
-      super.noSuchMethod(
+  set directories(List<_i10.SyncDirectoryModel>? _directories) => super.noSuchMethod(
         Invocation.setter(
           #directories,
           _directories,

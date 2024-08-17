@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:dartssh2/dartssh2.dart';
+import 'package:dartssh3/dartssh3.dart';
 import 'package:private_sync/models/config_model.dart';
 import 'package:private_sync/models/remote_directory_listing_model.dart';
 import 'package:private_sync/models/sync_directory_model.dart';
@@ -37,14 +37,12 @@ class Ssh {
     for (final item in items) {
       if (item.attr.isFile) {
         int modifiedTimestamp = item.attr.modifyTime as int;
-        files.add(
-            SyncFileModel('$path${item.filename}', DateTime.fromMillisecondsSinceEpoch(modifiedTimestamp * 1000)));
+        files.add(SyncFileModel('$path${item.filename}', DateTime.fromMillisecondsSinceEpoch(modifiedTimestamp * 1000)));
       }
       if (item.attr.isDirectory && item.filename != '.' && item.filename != '..') {
         directories.add(SyncDirectoryModel('$path${item.filename}', depth: depth));
 
-        RemoteDirectoryListingModel recursiveDirectory =
-            await listDirectory('$path${item.filename}/', depth: depth + 1);
+        RemoteDirectoryListingModel recursiveDirectory = await listDirectory('$path${item.filename}/', depth: depth + 1);
 
         files.insertAll(files.length, recursiveDirectory.files);
 
@@ -67,9 +65,8 @@ class Ssh {
 
   /// Upload a file to the SSH server
   Future<void> uploadFile(SyncFileModel localFile, String remotePath) async {
-    final file = await sftpClient.open(remotePath, mode: SftpFileOpenMode.create | SftpFileOpenMode.write);
-
-    await file.write(File(localFile.path).openRead().cast());
+    final file = await sftpClient.open(remotePath, mode: SftpFileOpenMode.truncate | SftpFileOpenMode.write);
+    await file.write(File(localFile.path).openRead().cast()).done;
 
     print('$remotePath uploaded');
 
@@ -101,6 +98,12 @@ class Ssh {
     return sftpClient.stat(path);
   }
 
+  /// Delete a file
+  Future<void> deleteFile(String path) async {
+    return await sftpClient.remove(path);
+  }
+
+  /// Close the SSH connection
   Future<void> close() async {
     sftpClient.close();
     client.close();

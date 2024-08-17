@@ -25,6 +25,7 @@ Make sure you have the Dart build tools installed on your system.
 ````
 git clone https://github.com/LikeFury/private-sync
 cd private-sync
+dart pub get
 dart compile exe ./bin/private_sync.dart
 sudo cp ./bin/private_sync.exe /usr/bin/private-sync
 sudo chmod +x /usr/bin/private-sync

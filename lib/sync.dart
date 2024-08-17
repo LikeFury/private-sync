@@ -20,14 +20,13 @@ class Sync {
     for (SyncFileModel file in localDirectory.files) {
       var strippedFilePath = file.path.substring(localDirectory.path.length);
 
-      SyncFileModel? matchedFile = remoteFiles
-          .firstWhereOrNull((SyncFileModel remoteFile) => remoteFile.path.substring(remoteDirectory.path.length) == strippedFilePath);
+      SyncFileModel? matchedFile = remoteFiles.firstWhereOrNull((SyncFileModel remoteFile) =>
+          remoteFile.path.substring(remoteDirectory.path.length) == strippedFilePath);
 
       if (matchedFile == null) {
         print('${file.path} not found on server, uploading...');
         await ssh.uploadFile(file, remoteDirectory.path + strippedFilePath);
       } else {
-        print(matchedFile.modifyTime.difference(file.modifyTime).inSeconds.abs());
         if (matchedFile.modifyTime.difference(file.modifyTime).inSeconds.abs() < 2) {
           print('${file.path} no change');
         } else if (matchedFile.modifyTime.isAfter(file.modifyTime)) {
@@ -62,8 +61,8 @@ class Sync {
       var strippedPath = directory.path.substring(localDirectory.path.length);
 
       // Look for directories on remote
-      SyncDirectoryModel? matchedDirectory = remoteDirectories
-          .firstWhereOrNull((SyncDirectoryModel directory) => directory.path.substring(remoteDirectory.path.length) == strippedPath);
+      SyncDirectoryModel? matchedDirectory = remoteDirectories.firstWhereOrNull(
+          (SyncDirectoryModel directory) => directory.path.substring(remoteDirectory.path.length) == strippedPath);
 
       // Create a directory if it does not exist
       if (matchedDirectory == null) {
@@ -73,7 +72,8 @@ class Sync {
       } else {
         // Remove known directories from the remote list
         print('Remote directory exists: ${matchedDirectory.path}');
-        remoteDirectories.removeWhere((SyncDirectoryModel remoteDirectory) => remoteDirectory.path == matchedDirectory.path);
+        remoteDirectories
+            .removeWhere((SyncDirectoryModel remoteDirectory) => remoteDirectory.path == matchedDirectory.path);
       }
     }
 
